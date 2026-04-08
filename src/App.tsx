@@ -3,11 +3,8 @@ import { type ColumnDef } from "@tanstack/react-table"
 
 // Lucide Icons
 import {
-  Activity,
   AlertCircle,
-  ArrowRight,
   Bell,
-  Calendar,
   Check,
   CheckCircle,
   ChevronRight,
@@ -19,20 +16,14 @@ import {
   Eye,
   FileText,
   Filter,
-  Heart,
   Info,
-  Mail,
   Moon,
   Plus,
   Search,
   Settings,
   Shield,
-  Star,
   Sun,
   Trash2,
-  TrendingUp,
-  User,
-  Users,
   X,
   Zap,
 } from "lucide-react"
@@ -68,7 +59,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger, TabsListUnderline, TabsTriggerUnderline } from "@/components/ui/tabs"
 import {
   Select,
   SelectContent,
@@ -89,8 +80,30 @@ import {
 } from "@/components/ui/tooltip"
 
 // Design System Components
-import { StatusBadge, type ClaimStatus } from "@/components/design-system/status-badge"
+import { StatusBadge, EligibilityBadge, type ClaimStatus, type EligibilityStatus } from "@/components/design-system/status-badge"
 import { MetricCard } from "@/components/design-system/metric-card"
+import { Copyable } from "@/components/design-system/copyable"
+import { Avatar } from "@/components/design-system/avatar"
+import { Pill } from "@/components/design-system/pill"
+import { TruCareToastProvider } from "@/components/design-system/toast-provider"
+import { toast } from "@/lib/toast"
+import { InfoTooltip } from "@/components/design-system/info-tooltip"
+import { Skeleton } from "@/components/design-system/skeleton"
+import { MetricCardSkeleton, TableRowSkeleton, FormFieldSkeleton } from "@/components/design-system/skeleton-presets"
+import { FieldError } from "@/components/design-system/field-error"
+import { ErrorState } from "@/components/design-system/error-state"
+import { FormInput } from "@/components/design-system/form-input"
+import { FormSelect } from "@/components/design-system/form-select"
+import { FormTextarea } from "@/components/design-system/form-textarea"
+import { EmptyState } from "@/components/design-system/empty-state"
+import { NoClaims, NoPatients, NoResults } from "@/components/design-system/empty-state-presets"
+import { FileUpload } from "@/components/design-system/file-upload"
+import { SidebarNav } from "@/components/design-system/sidebar-nav"
+import { AppHeader } from "@/components/design-system/app-header"
+import { AccountDropdown } from "@/components/design-system/account-dropdown"
+import { DetailPanel } from "@/components/design-system/detail-panel"
+import { DetailSection } from "@/components/design-system/detail-section"
+import { DetailRow } from "@/components/design-system/detail-row"
 import {
   DataTable,
   DataTableColumnHeader,
@@ -101,6 +114,7 @@ import {
   ActionsCell,
 } from "@/components/design-system/data-table"
 import { FilterBar, type FilterDefinition } from "@/components/design-system/filter-bar"
+import { IconBrowser } from "@/components/design-system/icon-browser"
 
 // ---------------------------------------------------------------------------
 // Data
@@ -122,10 +136,10 @@ const claimsData: Claim[] = [
   { id: "CLM-4524", patient: "James Wilson", payer: "Cigna", amount: 475.0, status: "in-review", filed: "2026-03-30" },
   { id: "CLM-4525", patient: "Maria Garcia", payer: "Humana", amount: 3200.0, status: "paid", filed: "2026-03-22" },
   { id: "CLM-4526", patient: "David Kim", payer: "United Healthcare", amount: 1680.0, status: "appealed", filed: "2026-03-20" },
-  { id: "CLM-4527", patient: "Lisa Thompson", payer: "Blue Cross", amount: 950.0, status: "eligible", filed: "2026-03-31" },
+  { id: "CLM-4527", patient: "Lisa Thompson", payer: "Blue Cross", amount: 950.0, status: "draft", filed: "2026-03-31" },
   { id: "CLM-4528", patient: "Robert Martinez", payer: "Aetna", amount: 2750.0, status: "pending", filed: "2026-03-27" },
   { id: "CLM-4529", patient: "Jennifer Lee", payer: "Cigna", amount: 1100.0, status: "submitted", filed: "2026-03-29" },
-  { id: "CLM-4530", patient: "William Davis", payer: "Humana", amount: 560.0, status: "ineligible", filed: "2026-03-26" },
+  { id: "CLM-4530", patient: "William Davis", payer: "Humana", amount: 560.0, status: "rejected", filed: "2026-03-26" },
   { id: "CLM-4531", patient: "Amanda White", payer: "United Healthcare", amount: 1890.0, status: "paid", filed: "2026-03-24" },
   { id: "CLM-4532", patient: "Christopher Brown", payer: "Blue Cross", amount: 720.0, status: "in-review", filed: "2026-03-30" },
   { id: "CLM-4533", patient: "Patricia Taylor", payer: "Aetna", amount: 3400.0, status: "denied", filed: "2026-03-18" },
@@ -138,6 +152,9 @@ const claimsData: Claim[] = [
 const claimColumns: ColumnDef<Claim, unknown>[] = [
   {
     id: "select",
+    size: 40,
+    minSize: 40,
+    maxSize: 40,
     header: ({ table }) => (
       <Checkbox
         checked={table.getIsAllPageRowsSelected()}
@@ -156,35 +173,57 @@ const claimColumns: ColumnDef<Claim, unknown>[] = [
   },
   {
     accessorKey: "id",
+    size: 120,
+    minSize: 100,
+    maxSize: 140,
     header: ({ column }) => <DataTableColumnHeader column={column} title="Claim ID" />,
     cell: ({ row }) => <IdCell value={row.getValue("id")} />,
   },
   {
     accessorKey: "patient",
+    size: 180,
+    minSize: 140,
+    maxSize: 260,
     header: ({ column }) => <DataTableColumnHeader column={column} title="Patient" />,
-    cell: ({ row }) => <span className="font-medium">{row.getValue("patient")}</span>,
+    cell: ({ row }) => <span className="font-medium truncate block">{row.getValue("patient")}</span>,
   },
   {
     accessorKey: "payer",
+    size: 160,
+    minSize: 120,
+    maxSize: 220,
     header: ({ column }) => <DataTableColumnHeader column={column} title="Payer" />,
+    cell: ({ row }) => <span className="truncate block">{row.getValue("payer")}</span>,
   },
   {
     accessorKey: "amount",
+    size: 110,
+    minSize: 90,
+    maxSize: 130,
     header: ({ column }) => <DataTableColumnHeader column={column} title="Amount" />,
     cell: ({ row }) => <CurrencyCell value={row.getValue("amount")} />,
   },
   {
     accessorKey: "status",
+    size: 120,
+    minSize: 100,
+    maxSize: 140,
     header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
     cell: ({ row }) => <StatusCell status={row.getValue("status")} />,
   },
   {
     accessorKey: "filed",
+    size: 110,
+    minSize: 90,
+    maxSize: 130,
     header: ({ column }) => <DataTableColumnHeader column={column} title="Filed Date" />,
     cell: ({ row }) => <DateCell value={row.getValue("filed")} />,
   },
   {
     id: "actions",
+    size: 50,
+    minSize: 50,
+    maxSize: 50,
     header: "",
     cell: ({ row }) => (
       <ActionsCell
@@ -201,8 +240,19 @@ const claimColumns: ColumnDef<Claim, unknown>[] = [
 ]
 
 const claimFilters: FilterDefinition[] = [
-  { label: "Status", value: "status", options: ["Paid", "Submitted", "Denied", "In Review", "Pending", "Appealed", "Eligible", "Ineligible"] },
-  { label: "Payer", value: "payer", options: ["United Healthcare", "Blue Cross", "Aetna", "Cigna", "Humana"] },
+  { label: "Status", value: "status", options: [
+    { label: "Paid", value: "paid" }, { label: "Submitted", value: "submitted" },
+    { label: "Denied", value: "denied" }, { label: "In Review", value: "in-review" },
+    { label: "Pending", value: "pending" }, { label: "Appealed", value: "appealed" },
+    { label: "Draft", value: "draft" }, { label: "Rejected", value: "rejected" },
+  ] },
+  { label: "Payer", value: "payer", options: [
+    { label: "United Healthcare", value: "united-healthcare" },
+    { label: "Blue Cross", value: "blue-cross" },
+    { label: "Aetna", value: "aetna" },
+    { label: "Cigna", value: "cigna" },
+    { label: "Humana", value: "humana" },
+  ] },
 ]
 
 // ---------------------------------------------------------------------------
@@ -214,21 +264,36 @@ const navGroups = [
     title: "Foundations",
     items: [
       { label: "Colors", id: "colors" },
+      { label: "Gradients", id: "gradients" },
       { label: "Typography", id: "typography" },
       { label: "Spacing", id: "spacing" },
+      { label: "Icons", id: "icons" },
     ],
   },
   {
     title: "Components",
     items: [
       { label: "Buttons", id: "buttons" },
+      { label: "Badge Comparison", id: "badge-comparison" },
       { label: "Status Badges", id: "status-badges" },
+      { label: "Pills", id: "pills" },
+      { label: "Avatars", id: "avatars" },
+      { label: "Copyable", id: "copyable" },
       { label: "Form Inputs", id: "form-inputs" },
       { label: "Cards", id: "cards" },
       { label: "Data Table", id: "data-table" },
       { label: "Metric Cards", id: "metric-cards" },
       { label: "Tabs & Navigation", id: "tabs-nav" },
       { label: "Dialogs & Sheets", id: "dialogs-sheets" },
+      { label: "Toasts", id: "toasts" },
+      { label: "Skeletons", id: "skeletons" },
+      { label: "Error States", id: "error-states" },
+      { label: "Form Fields", id: "form-fields" },
+      { label: "File Upload", id: "file-upload" },
+      { label: "Empty States", id: "empty-states" },
+      { label: "Sidebar Nav", id: "sidebar-nav-demo" },
+      { label: "App Header", id: "app-header-demo" },
+      { label: "Detail Panel", id: "detail-panel-demo" },
       { label: "Feedback", id: "feedback" },
     ],
   },
@@ -298,6 +363,8 @@ function App() {
   const [dark, setDark] = useState(false)
   const [activeSection, setActiveSection] = useState("colors")
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>({})
+  const [detailPanelOpen, setDetailPanelOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   useEffect(() => {
     if (dark) {
@@ -314,6 +381,7 @@ function App() {
 
   return (
     <TooltipProvider>
+      <TruCareToastProvider />
       <div className="min-h-screen bg-background text-foreground">
         {/* ============================================================
             HEADER
@@ -328,7 +396,7 @@ function App() {
               </svg>
             </div>
             <span className="text-sm font-semibold tracking-tight">TruCare Design System</span>
-            <Badge variant="secondary" className="text-xs">v1.0</Badge>
+            <Badge variant="secondary" className="text-xs">v2.0</Badge>
           </div>
 
           <Tooltip>
@@ -392,7 +460,7 @@ function App() {
                       {group.colors.map((c) => (
                         <div key={c.hex} className="flex flex-col items-center gap-1.5">
                           <div
-                            className="h-12 w-12 rounded-lg border shadow-sm"
+                            className="h-12 w-12 rounded-lg border"
                             style={{ backgroundColor: c.hex }}
                           />
                           <span className="text-xs font-medium">{c.name}</span>
@@ -400,6 +468,33 @@ function App() {
                         </div>
                       ))}
                     </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <Separator />
+
+            {/* ========================================
+                GRADIENTS
+                ======================================== */}
+            <section id="gradients">
+              <h2 className="text-xl font-medium">Gradients</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Brand gradients derived from the core palette. Use for feature highlights, hero areas, and accent backgrounds.</p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                {[
+                  { name: "Violet", css: "linear-gradient(135deg, #604FF8, #8478FA)" },
+                  { name: "Blue", css: "linear-gradient(135deg, #095BCE, #05377C)" },
+                  { name: "Teal", css: "linear-gradient(135deg, #22D3C1, #147F74)" },
+                  { name: "Ink", css: "linear-gradient(135deg, #151A20, #404D60)" },
+                  { name: "Brand", css: "linear-gradient(135deg, #604FF8, #095BCE)" },
+                ].map((g) => (
+                  <div key={g.name} className="flex flex-col items-center gap-1.5">
+                    <div
+                      className="h-16 w-28 rounded-lg border"
+                      style={{ background: g.css }}
+                    />
+                    <span className="text-xs font-medium">{g.name}</span>
                   </div>
                 ))}
               </div>
@@ -451,8 +546,19 @@ function App() {
                   <h3 className="mb-2 text-sm font-medium text-muted-foreground">Monospace (Geist Mono)</h3>
                   <div className="space-y-1">
                     <p className="font-mono text-sm">CLM-4521 &mdash; Claim Identifier</p>
-                    <p className="font-mono text-sm">$1,250.00 &mdash; Currency Value</p>
-                    <p className="font-mono text-xs text-muted-foreground">NPI: 1234567890 &mdash; Provider ID</p>
+                    <p className="font-mono text-sm">NPI: 1234567890 &mdash; Provider Identifier</p>
+                    <p className="font-mono text-xs text-muted-foreground">ICD-10: Z23 &mdash; Diagnosis Code</p>
+                  </div>
+                </Card>
+
+                <Card className="p-4">
+                  <h3 className="mb-2 text-sm font-medium text-muted-foreground">Tabular Nums (Geist Sans + tabular-nums)</h3>
+                  <p className="mb-3 text-xs text-muted-foreground">Column-aligned numbers using Geist Sans. No monospace aesthetic. Use for all numeric values that are NOT identifiers.</p>
+                  <div className="space-y-1">
+                    <p className="tabular-nums text-sm">$1,250.00 &mdash; Currency</p>
+                    <p className="tabular-nums text-sm">88.5% &mdash; Percentage</p>
+                    <p className="tabular-nums text-sm">(555) 123-4567 &mdash; Phone Number</p>
+                    <p className="tabular-nums text-sm">10,247 &mdash; Count</p>
                   </div>
                 </Card>
               </div>
@@ -476,6 +582,21 @@ function App() {
                     />
                   </div>
                 ))}
+              </div>
+            </section>
+
+            <Separator />
+
+            {/* ========================================
+                ICONS
+                ======================================== */}
+            <section id="icons">
+              <h2 className="text-xl font-medium">Icons</h2>
+              <p className="mt-1 text-sm text-muted-foreground">~150 curated Lucide icons organized by category. Hover for name, search to filter.</p>
+              <div className="mt-4">
+                <Card className="p-4">
+                  <IconBrowser />
+                </Card>
               </div>
             </section>
 
@@ -574,7 +695,7 @@ function App() {
                 <Card className="p-4">
                   <h3 className="mb-3 text-sm font-medium text-muted-foreground">Medium (default) with dots</h3>
                   <div className="flex flex-wrap gap-2">
-                    {(["eligible", "pending", "denied", "submitted", "in-review", "paid", "appealed", "ineligible"] as ClaimStatus[]).map(
+                    {(["draft", "submitted", "accepted", "rejected", "in-review", "pending", "denied", "appealed", "corrected", "paid", "partially-paid", "written-off", "voided", "on-hold"] as ClaimStatus[]).map(
                       (s) => <StatusBadge key={s} status={s} dot />
                     )}
                   </div>
@@ -583,17 +704,17 @@ function App() {
                 <Card className="p-4">
                   <h3 className="mb-3 text-sm font-medium text-muted-foreground">Small without dots</h3>
                   <div className="flex flex-wrap gap-2">
-                    {(["eligible", "pending", "denied", "submitted", "in-review", "paid", "appealed", "ineligible"] as ClaimStatus[]).map(
+                    {(["draft", "submitted", "accepted", "rejected", "in-review", "pending", "denied", "appealed", "corrected", "paid", "partially-paid", "written-off", "voided", "on-hold"] as ClaimStatus[]).map(
                       (s) => <StatusBadge key={s} status={s} size="sm" />
                     )}
                   </div>
                 </Card>
 
                 <Card className="p-4">
-                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Medium without dots</h3>
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">EligibilityBadge — Patient coverage status</h3>
                   <div className="flex flex-wrap gap-2">
-                    {(["eligible", "pending", "denied", "submitted", "in-review", "paid", "appealed", "ineligible"] as ClaimStatus[]).map(
-                      (s) => <StatusBadge key={s} status={s} />
+                    {(["eligible", "ineligible", "pending", "unknown"] as EligibilityStatus[]).map(
+                      (s) => <EligibilityBadge key={s} status={s} dot />
                     )}
                   </div>
                 </Card>
@@ -601,7 +722,7 @@ function App() {
                 <Card className="p-4">
                   <h3 className="mb-3 text-sm font-medium text-muted-foreground">Small with dots</h3>
                   <div className="flex flex-wrap gap-2">
-                    {(["eligible", "pending", "denied", "submitted", "in-review", "paid", "appealed", "ineligible"] as ClaimStatus[]).map(
+                    {(["draft", "submitted", "accepted", "rejected", "in-review", "pending", "denied", "appealed", "corrected", "paid", "partially-paid", "written-off", "voided", "on-hold"] as ClaimStatus[]).map(
                       (s) => <StatusBadge key={s} status={s} size="sm" dot />
                     )}
                   </div>
@@ -614,6 +735,222 @@ function App() {
                     <Badge variant="secondary">Secondary</Badge>
                     <Badge variant="destructive">Destructive</Badge>
                     <Badge variant="outline">Outline</Badge>
+                  </div>
+                </Card>
+              </div>
+            </section>
+
+            <Separator />
+
+            {/* ========================================
+                BADGE SHAPE COMPARISON
+                ======================================== */}
+            <section id="badge-comparison">
+              <h2 className="text-xl font-medium">Badge Shape Comparison</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Three distinct label types with different shapes and purposes. Review for stakeholder approval.</p>
+
+              <div className="mt-4 space-y-4">
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Badge — <code className="text-xs">rounded-md (6px)</code> — Semantic labels, counts, version numbers</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="default">v1.0</Badge>
+                    <Badge variant="secondary">12 claims</Badge>
+                    <Badge variant="outline">RCM</Badge>
+                    <Badge variant="destructive">Overdue</Badge>
+                  </div>
+                </Card>
+
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">StatusBadge — <code className="text-xs">rounded-md + border + dot</code> — Claim/workflow statuses only</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <StatusBadge status="draft" dot />
+                    <StatusBadge status="pending" dot />
+                    <StatusBadge status="denied" dot />
+                    <StatusBadge status="submitted" dot />
+                    <StatusBadge status="in-review" dot />
+                    <StatusBadge status="paid" dot />
+                  </div>
+                </Card>
+
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Pill — <code className="text-xs">rounded-full + bg only (no border)</code> — Soft tags, filters, user labels</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <Pill color="violet">Cardiology</Pill>
+                    <Pill color="blue">In-Network</Pill>
+                    <Pill color="teal">Primary Care</Pill>
+                    <Pill color="neutral">General</Pill>
+                    <Pill color="success">Active</Pill>
+                    <Pill color="warning">Expiring Soon</Pill>
+                    <Pill color="destructive">Terminated</Pill>
+                  </div>
+                </Card>
+
+                <Card className="p-4 border-primary/30">
+                  <h3 className="mb-2 text-sm font-medium">Decision Summary</h3>
+                  <ul className="space-y-1 text-sm text-muted-foreground">
+                    <li><strong>Badge</strong> — 6px radius, for counts/versions/categories. Not interactive.</li>
+                    <li><strong>StatusBadge</strong> — 6px radius with border + dot. Exclusively for claim lifecycle statuses.</li>
+                    <li><strong>Pill</strong> — Full pill, bg tint only, no border. For user-applied tags, department labels, payer associations. Optionally removable.</li>
+                  </ul>
+                </Card>
+              </div>
+            </section>
+
+            <Separator />
+
+            {/* ========================================
+                PILLS
+                ======================================== */}
+            <section id="pills">
+              <h2 className="text-xl font-medium">Pills</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Soft tags for non-status labels. Distinct from StatusBadge (no border, no dot).</p>
+
+              <div className="mt-4 space-y-4">
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Pill Shape (rounded-full) — All Colors</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <Pill color="gray">Gray</Pill>
+                    <Pill color="neutral">Neutral</Pill>
+                    <Pill color="violet">Cardiology</Pill>
+                    <Pill color="blue">In-Network</Pill>
+                    <Pill color="teal">Primary Care</Pill>
+                    <Pill color="success">Active</Pill>
+                    <Pill color="warning">Review Needed</Pill>
+                    <Pill color="destructive">Terminated</Pill>
+                  </div>
+                </Card>
+
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Rounded Shape (6px) — Squared Off</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <Pill color="gray" shape="rounded">Gray</Pill>
+                    <Pill color="violet" shape="rounded">Cardiology</Pill>
+                    <Pill color="blue" shape="rounded">In-Network</Pill>
+                    <Pill color="teal" shape="rounded">Primary Care</Pill>
+                    <Pill color="success" shape="rounded">Active</Pill>
+                    <Pill color="warning" shape="rounded">Review Needed</Pill>
+                    <Pill color="destructive" shape="rounded">Terminated</Pill>
+                  </div>
+                </Card>
+
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Small — Both Shapes</h3>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    <Pill color="gray" size="sm">Tag</Pill>
+                    <Pill color="violet" size="sm">Specialty</Pill>
+                    <Pill color="blue" size="sm">PPO</Pill>
+                    <Pill color="teal" size="sm">HMO</Pill>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Pill color="gray" size="sm" shape="rounded">Tag</Pill>
+                    <Pill color="violet" size="sm" shape="rounded">Specialty</Pill>
+                    <Pill color="blue" size="sm" shape="rounded">PPO</Pill>
+                    <Pill color="teal" size="sm" shape="rounded">HMO</Pill>
+                  </div>
+                </Card>
+
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Removable — Both Shapes</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <Pill color="violet" removable onRemove={() => {}}>Cardiology</Pill>
+                    <Pill color="blue" shape="rounded" removable onRemove={() => {}}>In-Network</Pill>
+                    <Pill color="gray" removable onRemove={() => {}}>General</Pill>
+                  </div>
+                </Card>
+              </div>
+            </section>
+
+            <Separator />
+
+            {/* ========================================
+                AVATARS
+                ======================================== */}
+            <section id="avatars">
+              <h2 className="text-xl font-medium">Avatars</h2>
+              <p className="mt-1 text-sm text-muted-foreground">First-letter avatars with deterministic colors derived from name hash.</p>
+
+              <div className="mt-4 space-y-4">
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">All Sizes</h3>
+                  <div className="flex items-end gap-4">
+                    <div className="flex flex-col items-center gap-1">
+                      <Avatar name="Sarah Johnson" size="xs" />
+                      <span className="text-xs text-muted-foreground">xs (20px)</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1">
+                      <Avatar name="Sarah Johnson" size="sm" />
+                      <span className="text-xs text-muted-foreground">sm (24px)</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1">
+                      <Avatar name="Sarah Johnson" size="md" />
+                      <span className="text-xs text-muted-foreground">md (32px)</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1">
+                      <Avatar name="Sarah Johnson" size="lg" />
+                      <span className="text-xs text-muted-foreground">lg (40px)</span>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Color Distribution (deterministic)</h3>
+                  <div className="flex flex-wrap gap-3">
+                    {["Sarah Johnson", "Michael Chen", "Emily Rodriguez", "James Wilson", "Maria Garcia", "David Kim", "Lisa Thompson", "Robert Martinez", "Jennifer Lee", "William Davis"].map((name) => (
+                      <div key={name} className="flex items-center gap-2">
+                        <Avatar name={name} size="sm" />
+                        <span className="text-xs">{name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Email Fallback</h3>
+                  <div className="flex items-center gap-3">
+                    <Avatar email="admin@trucarehealth.com" size="md" />
+                    <span className="text-sm text-muted-foreground">Falls back to first letter of email prefix</span>
+                  </div>
+                </Card>
+              </div>
+            </section>
+
+            <Separator />
+
+            {/* ========================================
+                COPYABLE
+                ======================================== */}
+            <section id="copyable">
+              <h2 className="text-xl font-medium">Copyable</h2>
+              <p className="mt-1 text-sm text-muted-foreground">One-click copy for IDs, emails, and other reference data. Click any value below to copy. IDs use <code className="text-xs">font-mono</code>, phone numbers use <code className="text-xs">tabular-nums</code>, emails use regular sans.</p>
+
+              <div className="mt-4 space-y-4">
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Claim IDs</h3>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3 group">
+                      <span className="text-xs text-muted-foreground w-16">Claim ID</span>
+                      <Copyable value="CLM-4521"><span className="font-mono text-sm">CLM-4521</span></Copyable>
+                    </div>
+                    <div className="flex items-center gap-3 group">
+                      <span className="text-xs text-muted-foreground w-16">NPI</span>
+                      <Copyable value="1234567890"><span className="font-mono text-sm">1234567890</span></Copyable>
+                    </div>
+                    <div className="flex items-center gap-3 group">
+                      <span className="text-xs text-muted-foreground w-16">Email</span>
+                      <Copyable value="sarah.johnson@email.com"><span className="text-sm">sarah.johnson@email.com</span></Copyable>
+                    </div>
+                    <div className="flex items-center gap-3 group">
+                      <span className="text-xs text-muted-foreground w-16">Phone</span>
+                      <Copyable value="(555) 123-4567"><span className="tabular-nums text-sm">(555) 123-4567</span></Copyable>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Masked Value (copies full, displays masked)</h3>
+                  <div className="flex items-center gap-3 group">
+                    <span className="text-xs text-muted-foreground w-16">SSN</span>
+                    <Copyable value="123-45-6789" sensitive ariaLabel="Copy SSN"><span className="font-mono text-sm">***-**-6789</span></Copyable>
                   </div>
                 </Card>
               </div>
@@ -827,7 +1164,7 @@ function App() {
                     <CardContent className="text-sm space-y-1.5">
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Total Billed</span>
-                        <span className="font-mono font-medium">$1,250.00</span>
+                        <span className="tabular-nums font-medium">$1,250.00</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Status</span>
@@ -947,6 +1284,39 @@ function App() {
                   </Tabs>
                 </Card>
 
+                {/* Underline Tabs (V2 — scales to 4+ tabs) */}
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Underline Tabs (V2)</h3>
+                  <Tabs defaultValue="demographics">
+                    <TabsListUnderline>
+                      <TabsTriggerUnderline value="demographics">Demographics</TabsTriggerUnderline>
+                      <TabsTriggerUnderline value="insurance">Insurance</TabsTriggerUnderline>
+                      <TabsTriggerUnderline value="consent">Consent</TabsTriggerUnderline>
+                      <TabsTriggerUnderline value="documents">Documents</TabsTriggerUnderline>
+                      <TabsTriggerUnderline value="billing">Billing</TabsTriggerUnderline>
+                      <TabsTriggerUnderline value="activity">Activity</TabsTriggerUnderline>
+                    </TabsListUnderline>
+                    <TabsContent value="demographics" className="mt-3 text-sm text-muted-foreground">
+                      Demographics content. Patient name, DOB, contact, address.
+                    </TabsContent>
+                    <TabsContent value="insurance" className="mt-3 text-sm text-muted-foreground">
+                      Insurance content. Primary and secondary payer details.
+                    </TabsContent>
+                    <TabsContent value="consent" className="mt-3 text-sm text-muted-foreground">
+                      Consent content. Signed forms and authorization status.
+                    </TabsContent>
+                    <TabsContent value="documents" className="mt-3 text-sm text-muted-foreground">
+                      Documents content. Uploaded files, EOBs, and correspondence.
+                    </TabsContent>
+                    <TabsContent value="billing" className="mt-3 text-sm text-muted-foreground">
+                      Billing content. Statement history and payment arrangements.
+                    </TabsContent>
+                    <TabsContent value="activity" className="mt-3 text-sm text-muted-foreground">
+                      Activity content. Full audit trail of account actions.
+                    </TabsContent>
+                  </Tabs>
+                </Card>
+
                 {/* Breadcrumb */}
                 <Card className="p-4">
                   <h3 className="mb-3 text-sm font-medium text-muted-foreground">Breadcrumb</h3>
@@ -1029,7 +1399,7 @@ function App() {
                             </div>
                             <div>
                               <span className="text-muted-foreground">Amount</span>
-                              <p className="font-mono font-medium">$1,250.00</p>
+                              <p className="tabular-nums font-medium">$1,250.00</p>
                             </div>
                             <div>
                               <span className="text-muted-foreground">Patient</span>
@@ -1098,15 +1468,15 @@ function App() {
                             </div>
                             <div className="flex justify-between">
                               <span className="text-muted-foreground">Billed</span>
-                              <span className="font-mono">$1,250.00</span>
+                              <span className="tabular-nums">$1,250.00</span>
                             </div>
                             <div className="flex justify-between">
                               <span className="text-muted-foreground">Allowed</span>
-                              <span className="font-mono">$1,125.00</span>
+                              <span className="tabular-nums">$1,125.00</span>
                             </div>
                             <div className="flex justify-between">
                               <span className="text-muted-foreground">Patient Resp.</span>
-                              <span className="font-mono">$125.00</span>
+                              <span className="tabular-nums">$125.00</span>
                             </div>
                           </div>
                         </div>
@@ -1119,6 +1489,395 @@ function App() {
                     </SheetContent>
                   </Sheet>
                 </Card>
+              </div>
+            </section>
+
+            <Separator />
+
+            {/* ========================================
+                TOASTS
+                ======================================== */}
+            <section id="toasts">
+              <h2 className="text-xl font-medium">Toasts</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Notification toasts using sonner. Bottom-right, max 3 visible, auto-dismiss in 4s.</p>
+
+              <div className="mt-4">
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Toast Variants</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <Button size="sm" variant="outline" onClick={() => toast.success("Claim submitted successfully")}>Success</Button>
+                    <Button size="sm" variant="outline" onClick={() => toast.error("Submission failed", { description: "Payer timeout after 30s. Please retry." })}>Error</Button>
+                    <Button size="sm" variant="outline" onClick={() => toast.warning("Timely filing deadline in 7 days")}>Warning</Button>
+                    <Button size="sm" variant="outline" onClick={() => toast.info("ERA file processing started")}>Info</Button>
+                    <Button size="sm" variant="outline" onClick={() => toast.default("Patient record updated")}>Default</Button>
+                    <Button size="sm" variant="outline" onClick={() => toast.promise(new Promise((r) => setTimeout(r, 2000)), { loading: "Verifying eligibility...", success: "Patient is eligible", error: "Verification failed" })}>Promise</Button>
+                  </div>
+                </Card>
+              </div>
+            </section>
+
+            <Separator />
+
+            {/* ========================================
+                SKELETONS
+                ======================================== */}
+            <section id="skeletons">
+              <h2 className="text-xl font-medium">Skeletons</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Loading placeholders for content that hasn't loaded yet.</p>
+
+              <div className="mt-4 space-y-4">
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Base Variants</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Rectangular (default)</p>
+                      <Skeleton width="100%" height={36} />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Text — 3 lines</p>
+                      <Skeleton variant="text" lines={3} />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Circular</p>
+                      <div className="flex gap-3">
+                        <Skeleton variant="circular" width={24} height={24} />
+                        <Skeleton variant="circular" width={32} height={32} />
+                        <Skeleton variant="circular" width={40} height={40} />
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Presets</h3>
+                  <div className="space-y-6">
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-2">MetricCardSkeleton</p>
+                      <div className="max-w-[240px]"><MetricCardSkeleton /></div>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-2">TableRowSkeleton (5 columns)</p>
+                      <TableRowSkeleton columns={5} />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-2">FormFieldSkeleton</p>
+                      <div className="max-w-[300px]"><FormFieldSkeleton /></div>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            </section>
+
+            <Separator />
+
+            {/* ========================================
+                ERROR STATES
+                ======================================== */}
+            <section id="error-states">
+              <h2 className="text-xl font-medium">Error States</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Inline field errors, section errors, and page-level error boundaries.</p>
+
+              <div className="mt-4 space-y-4">
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Field Error (inline)</h3>
+                  <div className="space-y-2">
+                    <FieldError message="NPI must be exactly 10 digits" />
+                    <FieldError message="This field is required" />
+                    <FieldError />
+                  </div>
+                </Card>
+
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Error State (section-level)</h3>
+                  <ErrorState
+                    title="Failed to load claims"
+                    description="The claims API returned an error. Please try again."
+                    action={{ label: "Retry", onClick: () => toast.info("Retrying...") }}
+                  />
+                </Card>
+              </div>
+            </section>
+
+            <Separator />
+
+            {/* ========================================
+                FORM FIELDS
+                ======================================== */}
+            <section id="form-fields">
+              <h2 className="text-xl font-medium">Form Fields</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Composed form components with labels, validation, info tooltips, and descriptions.</p>
+
+              <div className="mt-4 space-y-4">
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">FormInput</h3>
+                  <div className="grid grid-cols-2 gap-4 max-w-lg">
+                    <FormInput label="NPI" required placeholder="10-digit NPI" info="National Provider Identifier assigned by CMS" />
+                    <FormInput label="TIN" required placeholder="XX-XXXXXXX" error="TIN format is invalid" />
+                    <FormInput label="Member ID" placeholder="e.g. XHN-928371645" description="Found on the insurance card" />
+                    <FormInput label="Group Number" placeholder="e.g. GRP-00142" disabled />
+                  </div>
+                </Card>
+
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">FormSelect</h3>
+                  <div className="max-w-xs">
+                    <FormSelect
+                      label="Payer"
+                      required
+                      placeholder="Select a payer"
+                      info="Primary insurance carrier"
+                      options={[
+                        { label: "United Healthcare", value: "uhc" },
+                        { label: "Blue Cross Blue Shield", value: "bcbs" },
+                        { label: "Aetna", value: "aetna" },
+                        { label: "Cigna", value: "cigna" },
+                        { label: "Humana", value: "humana" },
+                      ]}
+                    />
+                  </div>
+                </Card>
+
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">FormTextarea</h3>
+                  <div className="max-w-lg">
+                    <FormTextarea
+                      label="Clinical Notes"
+                      description="Include any relevant clinical documentation for the claim."
+                      placeholder="Enter clinical notes..."
+                      rows={3}
+                    />
+                  </div>
+                </Card>
+
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Info Tooltips</h3>
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm">Hover for info:</span>
+                    <InfoTooltip content="National Provider Identifier — a unique 10-digit number assigned by CMS to healthcare providers." />
+                    <InfoTooltip content="Taxpayer Identification Number used for billing and tax reporting." side="right" />
+                  </div>
+                </Card>
+              </div>
+            </section>
+
+            <Separator />
+
+            {/* ========================================
+                FILE UPLOAD
+                ======================================== */}
+            <section id="file-upload">
+              <h2 className="text-xl font-medium">File Upload</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Drag-and-drop file upload with validation and progress states.</p>
+
+              <div className="mt-4 space-y-4">
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Upload Zone</h3>
+                  <FileUpload
+                    accept=".pdf,.jpg,.png"
+                    maxSizeMB={5}
+                    onFilesSelected={(files) => toast.success(`${files.length} file(s) selected: ${files.map(f => f.name).join(", ")}`)}
+                  />
+                </Card>
+
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Disabled State</h3>
+                  <FileUpload
+                    accept=".pdf"
+                    disabled
+                    onFilesSelected={() => {}}
+                  />
+                </Card>
+              </div>
+            </section>
+
+            <Separator />
+
+            {/* ========================================
+                EMPTY STATES
+                ======================================== */}
+            <section id="empty-states">
+              <h2 className="text-xl font-medium">Empty States</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Zero-data placeholders with healthcare-specific presets.</p>
+
+              <div className="mt-4 space-y-4">
+                <Card className="p-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Custom Empty State</h3>
+                  <EmptyState
+                    title="No appointments scheduled"
+                    description="Schedule an appointment to see it appear here."
+                    action={{ label: "Schedule", onClick: () => toast.info("Scheduling..."), icon: <Plus className="h-4 w-4" /> }}
+                  />
+                </Card>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <Card className="p-4">
+                    <h3 className="mb-2 text-xs font-medium text-muted-foreground">NoClaims</h3>
+                    <NoClaims onCreateClaim={() => toast.info("Creating claim...")} />
+                  </Card>
+                  <Card className="p-4">
+                    <h3 className="mb-2 text-xs font-medium text-muted-foreground">NoPatients</h3>
+                    <NoPatients />
+                  </Card>
+                  <Card className="p-4">
+                    <h3 className="mb-2 text-xs font-medium text-muted-foreground">NoResults</h3>
+                    <NoResults onClearFilters={() => toast.info("Clearing filters...")} />
+                  </Card>
+                </div>
+              </div>
+            </section>
+
+            <Separator />
+
+            {/* ========================================
+                SIDEBAR NAV DEMO
+                ======================================== */}
+            <section id="sidebar-nav-demo">
+              <h2 className="text-xl font-medium">Sidebar Navigation</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Collapsible sidebar with grouped nav items, active states, and badge counts.</p>
+
+              <div className="mt-4">
+                <Card className="p-0 overflow-hidden">
+                  <div className="flex">
+                    <SidebarNav
+                      collapsed={sidebarCollapsed}
+                      onCollapsedChange={setSidebarCollapsed}
+                      groups={[
+                        {
+                          title: "Overview",
+                          items: [
+                            { label: "Dashboard", icon: <Zap className="h-4 w-4" />, active: true },
+                            { label: "Notifications", icon: <Bell className="h-4 w-4" />, badge: 3 },
+                          ],
+                        },
+                        {
+                          title: "Claims",
+                          items: [
+                            { label: "All Claims", icon: <ClipboardList className="h-4 w-4" /> },
+                            { label: "Denied", icon: <AlertCircle className="h-4 w-4" />, badge: 12 },
+                            { label: "Appeals", icon: <FileText className="h-4 w-4" /> },
+                          ],
+                        },
+                        {
+                          title: "Settings",
+                          items: [
+                            { label: "Practice", icon: <Settings className="h-4 w-4" /> },
+                            { label: "Billing", icon: <CreditCard className="h-4 w-4" />, disabled: true },
+                          ],
+                        },
+                      ]}
+                      className="h-[320px] border-r relative"
+                    />
+                    <div className="flex-1 p-6 flex items-center justify-center text-sm text-muted-foreground">
+                      {sidebarCollapsed ? "Sidebar collapsed (48px)" : "Sidebar expanded (200px)"} — click the collapse toggle at the bottom
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            </section>
+
+            <Separator />
+
+            {/* ========================================
+                APP HEADER DEMO
+                ======================================== */}
+            <section id="app-header-demo">
+              <h2 className="text-xl font-medium">App Header</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Fixed header with logo, global action, theme toggle, and account dropdown.</p>
+
+              <div className="mt-4">
+                <Card className="p-0 overflow-hidden">
+                  <AppHeader
+                    logo={
+                      <div className="flex h-7 w-7 items-center justify-center rounded-md bg-tc-violet">
+                        <Shield className="h-4 w-4 text-white" />
+                      </div>
+                    }
+                    title="TruCare"
+                    version="v2.0"
+                    globalAction={{ label: "New Claim", icon: <Plus className="h-4 w-4" />, onClick: () => toast.info("New claim action") }}
+                    user={{ name: "Dr. Sarah Johnson", email: "sarah@trucarehealth.com" }}
+                    onThemeToggle={() => setDark(!dark)}
+                    isDark={dark}
+                    className="relative"
+                  />
+                </Card>
+
+                <Card className="p-4 mt-4">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Account Dropdown (standalone)</h3>
+                  <div className="flex items-center gap-3">
+                    <AccountDropdown
+                      user={{ name: "Dr. Sarah Johnson", email: "sarah@trucarehealth.com" }}
+                      onSettings={() => toast.info("Settings clicked")}
+                      onLogout={() => toast.info("Logout clicked")}
+                      menuItems={[
+                        { label: "My Profile", icon: <Eye className="h-4 w-4" />, onClick: () => toast.info("Profile") },
+                      ]}
+                    />
+                    <span className="text-sm text-muted-foreground">Click the avatar to open the dropdown</span>
+                  </div>
+                </Card>
+              </div>
+            </section>
+
+            <Separator />
+
+            {/* ========================================
+                DETAIL PANEL DEMO
+                ======================================== */}
+            <section id="detail-panel-demo">
+              <h2 className="text-xl font-medium">Detail Panel</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Right-side drawer for record details with key-value rows and collapsible sections.</p>
+
+              <div className="mt-4">
+                <Card className="p-4">
+                  <Button onClick={() => setDetailPanelOpen(true)}>Open Detail Panel</Button>
+                </Card>
+
+                <DetailPanel
+                  open={detailPanelOpen}
+                  onOpenChange={setDetailPanelOpen}
+                  title="CLM-4521"
+                  subtitle="Sarah Johnson — United Healthcare"
+                  badge={<StatusBadge status="paid" dot />}
+                  width="md"
+                  footer={
+                    <>
+                      <Button variant="outline" size="sm" onClick={() => setDetailPanelOpen(false)}>Close</Button>
+                      <Button size="sm" onClick={() => toast.success("Claim updated")}>Save Changes</Button>
+                    </>
+                  }
+                >
+                  <div className="space-y-6">
+                    <DetailSection title="Patient Information">
+                      <div className="space-y-0">
+                        <DetailRow label="Patient" value="Sarah Johnson" />
+                        <DetailRow label="DOB" value="01/15/1990" />
+                        <DetailRow label="MRN" value="MRN-00482916" mono copyable />
+                        <DetailRow label="Email" value="sarah.johnson@email.com" copyable />
+                        <DetailRow label="Phone" value="(555) 123-4567" tabularNums copyable />
+                      </div>
+                    </DetailSection>
+
+                    <DetailSection title="Claim Details">
+                      <div className="space-y-0">
+                        <DetailRow label="Claim ID" value="CLM-4521" mono copyable />
+                        <DetailRow label="Amount" value="$1,250.00" tabularNums />
+                        <DetailRow label="Payer" value="United Healthcare" />
+                        <DetailRow label="Filed Date" value="March 28, 2026" />
+                        <DetailRow label="NPI" value="1234567890" mono copyable />
+                      </div>
+                    </DetailSection>
+
+                    <DetailSection title="Status History" collapsible defaultOpen={false}>
+                      <div className="space-y-0">
+                        <DetailRow label="Mar 28" value="Submitted" />
+                        <DetailRow label="Mar 29" value="Accepted by payer" />
+                        <DetailRow label="Mar 31" value="In Review" />
+                        <DetailRow label="Apr 2" value="Paid — $1,250.00" />
+                      </div>
+                    </DetailSection>
+                  </div>
+                </DetailPanel>
               </div>
             </section>
 
@@ -1139,28 +1898,28 @@ function App() {
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-xs">
                         <span className="text-muted-foreground">Claims batch upload</span>
-                        <span className="font-mono">25%</span>
+                        <span className="tabular-nums">25%</span>
                       </div>
                       <Progress value={25} />
                     </div>
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-xs">
                         <span className="text-muted-foreground">ERA processing</span>
-                        <span className="font-mono">60%</span>
+                        <span className="tabular-nums">60%</span>
                       </div>
                       <Progress value={60} />
                     </div>
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-xs">
                         <span className="text-muted-foreground">Monthly target</span>
-                        <span className="font-mono">88%</span>
+                        <span className="tabular-nums">88%</span>
                       </div>
                       <Progress value={88} />
                     </div>
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-xs">
                         <span className="text-muted-foreground">Verification complete</span>
-                        <span className="font-mono">100%</span>
+                        <span className="tabular-nums">100%</span>
                       </div>
                       <Progress value={100} />
                     </div>

@@ -1,6 +1,7 @@
 import type { Table } from "@tanstack/react-table"
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Select,
@@ -9,6 +10,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+
+function getPageRange(current: number, total: number): (number | "...")[] {
+  if (total <= 5) return Array.from({ length: total }, (_, i) => i)
+  if (current <= 2) return [0, 1, 2, "...", total - 1]
+  if (current >= total - 3) return [0, "...", total - 3, total - 2, total - 1]
+  return [0, "...", current - 1, current, current + 1, "...", total - 1]
+}
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>
@@ -19,6 +27,10 @@ export function DataTablePagination<TData>({
   table,
   enableRowSelection = false,
 }: DataTablePaginationProps<TData>) {
+  const currentPage = table.getState().pagination.pageIndex
+  const pageCount = table.getPageCount()
+  const pages = getPageRange(currentPage, pageCount)
+
   return (
     <div className="flex items-center justify-between px-2 py-3">
       {/* Selected row count */}
@@ -51,23 +63,8 @@ export function DataTablePagination<TData>({
           </Select>
         </div>
 
-        {/* Page indicator */}
-        <div className="flex w-[100px] items-center justify-center text-[13px] font-medium">
-          Page {table.getState().pagination.pageIndex + 1} of{" "}
-          {table.getPageCount()}
-        </div>
-
         {/* Pagination buttons */}
         <div className="flex items-center gap-1">
-          <Button
-            variant="outline"
-            size="icon-xs"
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <span className="sr-only">Go to first page</span>
-            <ChevronsLeft className="h-4 w-4" />
-          </Button>
           <Button
             variant="outline"
             size="icon-xs"
@@ -77,6 +74,31 @@ export function DataTablePagination<TData>({
             <span className="sr-only">Go to previous page</span>
             <ChevronLeft className="h-4 w-4" />
           </Button>
+
+          {pages.map((page, i) =>
+            page === "..." ? (
+              <span
+                key={`ellipsis-${i}`}
+                className="flex h-7 w-7 items-center justify-center text-[13px] text-muted-foreground"
+              >
+                ...
+              </span>
+            ) : (
+              <Button
+                key={page}
+                variant={page === currentPage ? "default" : "outline"}
+                size="icon-xs"
+                onClick={() => table.setPageIndex(page)}
+                className={cn(
+                  "text-[13px]",
+                  page === currentPage && "pointer-events-none"
+                )}
+              >
+                {page + 1}
+              </Button>
+            )
+          )}
+
           <Button
             variant="outline"
             size="icon-xs"
@@ -85,15 +107,6 @@ export function DataTablePagination<TData>({
           >
             <span className="sr-only">Go to next page</span>
             <ChevronRight className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon-xs"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-          >
-            <span className="sr-only">Go to last page</span>
-            <ChevronsRight className="h-4 w-4" />
           </Button>
         </div>
       </div>

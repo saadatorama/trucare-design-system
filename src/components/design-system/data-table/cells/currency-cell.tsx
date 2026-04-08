@@ -11,7 +11,7 @@ const formatter = new Intl.NumberFormat("en-US", {
 
 export function CurrencyCell({ value }: CurrencyCellProps) {
   return (
-    <span className="text-right font-mono text-[13px] tabular-nums">
+    <span className="text-right text-[13px] tabular-nums">
       {formatter.format(value)}
     </span>
   )

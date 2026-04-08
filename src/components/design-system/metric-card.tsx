@@ -8,6 +8,8 @@ export interface MetricCardProps {
   title: string
   value: string | number
   change?: { value: number; label: string }
+  /** When true, a negative change is good (green) and positive is bad (red). Use for metrics like "Denial Rate" or "Days in AR". */
+  invertTrend?: boolean
   icon?: React.ReactNode
   className?: string
 }
@@ -16,10 +18,12 @@ export function MetricCard({
   title,
   value,
   change,
+  invertTrend = false,
   icon,
   className,
 }: MetricCardProps) {
-  const isPositive = change ? change.value >= 0 : undefined
+  const rawPositive = change ? change.value >= 0 : undefined
+  const isPositive = invertTrend ? !rawPositive : rawPositive
 
   return (
     <Card className={cn("p-4", className)}>
@@ -35,7 +39,7 @@ export function MetricCard({
       </div>
 
       <div className="mt-2 flex items-end gap-2">
-        <span className="font-mono text-2xl font-semibold tabular-nums">
+        <span className="text-2xl font-semibold tabular-nums">
           {value}
         </span>
 
@@ -47,9 +51,9 @@ export function MetricCard({
             )}
           >
             {isPositive ? (
-              <ArrowUp className="h-3.5 w-3.5" />
+              <ArrowUp className="h-3.5 w-3.5" aria-label="Increased" />
             ) : (
-              <ArrowDown className="h-3.5 w-3.5" />
+              <ArrowDown className="h-3.5 w-3.5" aria-label="Decreased" />
             )}
             {Math.abs(change.value)}%
           </span>
