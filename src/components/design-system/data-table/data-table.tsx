@@ -4,6 +4,8 @@ import {
   type ColumnFiltersState,
   type SortingState,
   type RowSelectionState,
+  type VisibilityState,
+  type PaginationState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -38,6 +40,14 @@ export interface DataTableProps<TData> {
   emptyMessage?: string
   emptyAction?: React.ReactNode
   onRowClick?: (row: TData) => void
+  /** Accessible label for the table. Required for screen readers. */
+  ariaLabel?: string
+  /** Server-side pagination: total page count (enables controlled mode). */
+  pageCount?: number
+  /** Server-side pagination: callback when page/size changes. */
+  onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void
+  /** Expose the table instance for external control (column visibility, selection, etc.) */
+  onTableReady?: (table: ReturnType<typeof useReactTable<TData>>) => void
 }
 
 const densityClasses = {
@@ -71,10 +81,21 @@ export function DataTable<TData>({
   emptyMessage = "No results found.",
   emptyAction,
   onRowClick,
+  ariaLabel,
+  pageCount,
+  onPaginationChange,
+  onTableReady,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize,
+  })
+
+  const isServerSide = pageCount !== undefined
 
   const table = useReactTable({
     data,
@@ -83,23 +104,36 @@ export function DataTable<TData>({
       sorting,
       columnFilters,
       rowSelection,
+      columnVisibility,
+      pagination,
     },
     enableRowSelection,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onRowSelectionChange: setRowSelection,
+    onColumnVisibilityChange: setColumnVisibility,
+    onPaginationChange: (updater) => {
+      const newPagination =
+        typeof updater === "function" ? updater(pagination) : updater
+      setPagination(newPagination)
+      onPaginationChange?.(newPagination)
+    },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    ...(enablePagination && {
+    ...(enablePagination && !isServerSide && {
       getPaginationRowModel: getPaginationRowModel(),
     }),
-    initialState: {
-      pagination: {
-        pageSize,
-      },
-    },
+    ...(isServerSide && {
+      pageCount,
+      manualPagination: true,
+    }),
   })
+
+  // Expose table instance for external control
+  if (onTableReady) {
+    onTableReady(table)
+  }
 
   const dClasses = densityClasses[density]
 
@@ -129,7 +163,7 @@ export function DataTable<TData>({
 
       {/* Table */}
       <div className="rounded-md border">
-        <Table>
+        <Table className="table-fixed w-full" aria-label={ariaLabel}>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="hover:bg-transparent">
@@ -138,8 +172,13 @@ export function DataTable<TData>({
                     key={header.id}
                     className={cn(
                       dClasses.head,
-                      "sticky top-0 z-10 bg-muted/50 backdrop-blur-sm"
+                      "sticky top-0 z-[var(--z-sticky,10)] bg-muted/50 backdrop-blur-sm"
                     )}
+                    style={{
+                      width: header.getSize(),
+                      minWidth: header.column.columnDef.minSize,
+                      maxWidth: header.column.columnDef.maxSize,
+                    }}
                   >
                     {header.isPlaceholder
                       ? null
@@ -171,14 +210,31 @@ export function DataTable<TData>({
                   data-state={row.getIsSelected() && "selected"}
                   className={cn(
                     dClasses.row,
-                    "hover:bg-muted/50",
-                    row.getIsSelected() && "bg-primary/5",
+                    row.getIsSelected() && "border-l-2 border-l-primary",
                     onRowClick && "cursor-pointer"
                   )}
                   onClick={() => onRowClick?.(row.original)}
+                  {...(onRowClick ? {
+                    tabIndex: 0,
+                    role: "button",
+                    onKeyDown: (e: React.KeyboardEvent) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault()
+                        onRowClick(row.original)
+                      }
+                    },
+                  } : {})}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className={dClasses.cell}>
+                    <TableCell
+                      key={cell.id}
+                      className={dClasses.cell}
+                      style={{
+                        width: cell.column.getSize(),
+                        minWidth: cell.column.columnDef.minSize,
+                        maxWidth: cell.column.columnDef.maxSize,
+                      }}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

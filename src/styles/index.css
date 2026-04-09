@@ -4,10 +4,10 @@
    TruCare Design System — Foundation Tokens
    ============================================ */
 
-/* Geist Font */
+/* Geist Font — self-hosted for HIPAA compliance (no third-party CDN requests) */
 @font-face {
   font-family: 'Geist';
-  src: url('https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/Geist-Variable.woff2') format('woff2');
+  src: url('/fonts/Geist-Variable.woff2') format('woff2');
   font-weight: 100 900;
   font-display: swap;
   font-style: normal;
@@ -15,7 +15,7 @@
 
 @font-face {
   font-family: 'Geist Mono';
-  src: url('https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-mono/GeistMono-Variable.woff2') format('woff2');
+  src: url('/fonts/GeistMono-Variable.woff2') format('woff2');
   font-weight: 100 900;
   font-display: swap;
   font-style: normal;
@@ -54,22 +54,76 @@
   --radius-xl: 12px;
   --radius-full: 9999px;
 
-  /* Elevation */
-  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  /* Gradients */
+  --gradient-violet: linear-gradient(135deg, #604FF8, #8478FA);
+  --gradient-blue: linear-gradient(135deg, #095BCE, #05377C);
+  --gradient-teal: linear-gradient(135deg, #22D3C1, #147F74);
+  --gradient-ink: linear-gradient(135deg, #151A20, #404D60);
+  --gradient-brand: linear-gradient(135deg, #604FF8, #095BCE);
+
+  /* Typography Scale — Admin (max 24px, NOT marketing) */
+  --text-page-title: 24px;
+  --text-section-title: 20px;
+  --text-subtitle: 16px;
+  --text-body: 14px;
+  --text-body-small: 13px;
+  --text-caption: 12px;
+  --text-micro: 11px;
+
+  /* Elevation — "no shade, just border" for cards/buttons.
+     shadow-md reserved for overlays (dropdown, popover, tooltip).
+     shadow-lg reserved for dialogs/sheets. */
   --shadow-md: 0 2px 8px -1px rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
   --shadow-lg: 0 4px 16px -2px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
 
   /* Animation */
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  /* Semantic Colors — bridged from CSS variables for Tailwind v4 utility generation */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 }
 
 :root {
   /* Shadcn-compatible CSS Variables */
   --radius: 0.375rem; /* 6px */
 
-  --background: oklch(0.97 0.005 250);
+  --background: oklch(0.98 0.002 260);
   --foreground: oklch(0.15 0.02 250);
 
   --card: oklch(1 0 0);
@@ -81,14 +135,14 @@
   --primary: oklch(0.55 0.24 280);
   --primary-foreground: oklch(1 0 0);
 
-  --secondary: oklch(0.96 0.005 250);
+  --secondary: oklch(0.965 0.003 260);
   --secondary-foreground: oklch(0.25 0.02 250);
 
-  --muted: oklch(0.94 0.005 250);
+  --muted: oklch(0.965 0.003 260);
   --muted-foreground: oklch(0.48 0.03 250);
 
-  --accent: oklch(0.78 0.14 180);
-  --accent-foreground: oklch(0.15 0.04 180);
+  --accent: oklch(0.94 0.003 260);
+  --accent-foreground: oklch(0.15 0.02 250);
 
   --destructive: oklch(0.55 0.2 25);
   --destructive-foreground: oklch(1 0 0);
@@ -130,6 +184,70 @@
   --status-in-review-bg: oklch(0.96 0.04 280);
   --status-in-review-text: oklch(0.48 0.15 280);
   --status-in-review-border: oklch(0.85 0.06 280);
+
+  /* Status Tokens — Accepted (payer acknowledged receipt, 277CA) */
+  --status-accepted-bg: oklch(0.96 0.04 195);
+  --status-accepted-text: oklch(0.4 0.1 195);
+  --status-accepted-border: oklch(0.85 0.06 195);
+
+  /* Status Tokens — Partially Paid */
+  --status-partially-paid-bg: oklch(0.96 0.04 60);
+  --status-partially-paid-text: oklch(0.42 0.12 55);
+  --status-partially-paid-border: oklch(0.85 0.06 60);
+
+  /* Status Tokens — Voided (cancelled, duplicate, wrong patient) */
+  --status-voided-bg: oklch(0.95 0.005 250);
+  --status-voided-text: oklch(0.45 0.02 250);
+  --status-voided-border: oklch(0.87 0.01 250);
+
+  /* Pill Tokens — Non-status soft tags (bg tint only, no border) */
+  --pill-neutral-bg: oklch(0.95 0.005 250);
+  --pill-neutral-text: oklch(0.35 0.02 250);
+  --pill-violet-bg: oklch(0.94 0.04 280);
+  --pill-violet-text: oklch(0.45 0.15 280);
+  --pill-blue-bg: oklch(0.94 0.03 255);
+  --pill-blue-text: oklch(0.42 0.14 255);
+  --pill-teal-bg: oklch(0.94 0.04 180);
+  --pill-teal-text: oklch(0.4 0.12 180);
+  --pill-success-bg: oklch(0.94 0.04 160);
+  --pill-success-text: oklch(0.4 0.1 160);
+  --pill-warning-bg: oklch(0.94 0.04 80);
+  --pill-warning-text: oklch(0.42 0.1 70);
+  --pill-destructive-bg: oklch(0.94 0.03 25);
+  --pill-destructive-text: oklch(0.48 0.12 25);
+
+  /* Status Tokens — Draft (gray, neutral — not yet submitted) */
+  --status-draft-bg: oklch(0.96 0.005 250);
+  --status-draft-text: oklch(0.4 0.02 250);
+  --status-draft-border: oklch(0.87 0.01 250);
+
+  /* Status Tokens — Rejected (hot red, distinct from denied — clearinghouse/payer never processed) */
+  --status-rejected-bg: oklch(0.95 0.04 20);
+  --status-rejected-text: oklch(0.42 0.18 18);
+  --status-rejected-border: oklch(0.82 0.08 20);
+
+  /* Status Tokens — Corrected (blue, resubmission) */
+  --status-corrected-bg: oklch(0.96 0.03 240);
+  --status-corrected-text: oklch(0.42 0.14 240);
+  --status-corrected-border: oklch(0.85 0.05 240);
+
+  /* Status Tokens — Written Off (muted, terminal) */
+  --status-written-off-bg: oklch(0.96 0.003 250);
+  --status-written-off-text: oklch(0.5 0.015 250);
+  --status-written-off-border: oklch(0.88 0.005 250);
+
+  /* Status Tokens — On Hold (amber/gray, intentionally paused) */
+  --status-on-hold-bg: oklch(0.96 0.02 80);
+  --status-on-hold-text: oklch(0.45 0.06 75);
+  --status-on-hold-border: oklch(0.87 0.03 80);
+
+  /* Z-Index Layers */
+  --z-sticky: 10;
+  --z-header: 20;
+  --z-dropdown: 30;
+  --z-overlay: 40;
+  --z-modal: 50;
+  --z-toast: 60;
 
   /* Motion */
   --duration-instant: 50ms;
@@ -173,8 +291,8 @@
   --muted: oklch(0.25 0.02 250);
   --muted-foreground: oklch(0.65 0.02 250);
 
-  --accent: oklch(0.72 0.12 180);
-  --accent-foreground: oklch(1 0 0);
+  --accent: oklch(0.28 0.005 250);
+  --accent-foreground: oklch(0.95 0.005 250);
 
   --destructive: oklch(0.55 0.2 25);
   --destructive-foreground: oklch(1 0 0);
@@ -212,7 +330,72 @@
   --status-in-review-bg: oklch(0.22 0.04 280);
   --status-in-review-text: oklch(0.72 0.14 280);
   --status-in-review-border: oklch(0.3 0.06 280);
+
+  --status-accepted-bg: oklch(0.22 0.04 195);
+  --status-accepted-text: oklch(0.75 0.1 195);
+  --status-accepted-border: oklch(0.3 0.06 195);
+
+  --status-partially-paid-bg: oklch(0.22 0.04 60);
+  --status-partially-paid-text: oklch(0.78 0.12 60);
+  --status-partially-paid-border: oklch(0.3 0.06 60);
+
+  --status-voided-bg: oklch(0.22 0.005 250);
+  --status-voided-text: oklch(0.6 0.02 250);
+  --status-voided-border: oklch(0.3 0.01 250);
+
+  --status-draft-bg: oklch(0.22 0.005 250);
+  --status-draft-text: oklch(0.65 0.02 250);
+  --status-draft-border: oklch(0.3 0.01 250);
+
+  --status-rejected-bg: oklch(0.22 0.04 20);
+  --status-rejected-text: oklch(0.75 0.16 18);
+  --status-rejected-border: oklch(0.32 0.08 20);
+
+  --status-corrected-bg: oklch(0.22 0.03 240);
+  --status-corrected-text: oklch(0.72 0.12 240);
+  --status-corrected-border: oklch(0.3 0.05 240);
+
+  --status-written-off-bg: oklch(0.2 0.003 250);
+  --status-written-off-text: oklch(0.55 0.015 250);
+  --status-written-off-border: oklch(0.28 0.005 250);
+
+  --status-on-hold-bg: oklch(0.22 0.02 80);
+  --status-on-hold-text: oklch(0.72 0.06 75);
+  --status-on-hold-border: oklch(0.3 0.03 80);
+
+  /* Pill Tokens — Dark */
+  --pill-neutral-bg: oklch(0.25 0.005 250);
+  --pill-neutral-text: oklch(0.72 0.02 250);
+  --pill-violet-bg: oklch(0.22 0.04 280);
+  --pill-violet-text: oklch(0.72 0.14 280);
+  --pill-blue-bg: oklch(0.22 0.03 255);
+  --pill-blue-text: oklch(0.72 0.12 255);
+  --pill-teal-bg: oklch(0.22 0.04 180);
+  --pill-teal-text: oklch(0.72 0.12 180);
+  --pill-success-bg: oklch(0.22 0.04 160);
+  --pill-success-text: oklch(0.72 0.12 160);
+  --pill-warning-bg: oklch(0.22 0.04 80);
+  --pill-warning-text: oklch(0.72 0.12 80);
+  --pill-destructive-bg: oklch(0.22 0.03 25);
+  --pill-destructive-text: oklch(0.72 0.12 25);
 }
+
+/* ============================================
+   Typography Rules
+   ============================================
+   MONO (Geist Mono): ONLY for identifiers where O/0 distinction matters:
+     Claim IDs (CLM-xxxx), NPI, TIN, payer IDs, member IDs, MRN, SSN (masked)
+     CPT codes, ICD codes, error codes, API responses, code snippets
+
+   TABULAR-NUMS (Geist Sans + tabular-nums): For aligned numbers WITHOUT mono:
+     Currency ($1,234.56), percentages, counts, phone numbers, zip codes
+     This gives column alignment in tables without the monospace aesthetic.
+
+   REGULAR (Geist Sans): Everything else:
+     Names, dates, labels, descriptions, status text, navigation
+
+   RECEIPTS: Monospace is acceptable (different context, print-oriented)
+   ============================================ */
 
 /* ============================================
    Base Styles
@@ -239,4 +422,67 @@ body {
 @keyframes accordion-up {
   from { height: var(--radix-accordion-content-height); }
   to { height: 0; }
+}
+
+/* ============================================
+   Reduced Motion — WCAG 2.1 AA (2.3.3)
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================
+   Print Styles — PHI Redaction & Chrome Removal
+   ============================================ */
+@media print {
+  /* Hide navigation chrome */
+  nav,
+  [role="navigation"],
+  aside,
+  header,
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  /* Expand main content to full width */
+  main {
+    width: 100% !important;
+    padding: 0 !important;
+  }
+
+  /* Mask PHI elements — any element with data-phi="true" */
+  [data-phi="true"] {
+    visibility: hidden;
+    position: relative;
+  }
+  [data-phi="true"]::after {
+    content: "[REDACTED]";
+    visibility: visible;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    font-size: 11px;
+    color: #666;
+    font-style: italic;
+  }
+
+  /* Preserve status badge colors in print */
+  .status-badge,
+  [data-status] {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Remove shadows */
+  * {
+    box-shadow: none !important;
+  }
 }
