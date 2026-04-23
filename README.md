@@ -2,21 +2,6 @@
 
 TruCare Design System — React component library for healthcare and revenue cycle management admin interfaces.
 
-## v3.0 — Claude Design handoff normalization
-
-Merges the [Claude Design handoff bundle](./brand-bundle/bundle-README.md) (id `l9c2v3kLvK0uNR2psuNXgw`) into the design system as a token-and-assets pass. All v2.2 decisions preserved (36px buttons, 6px radius, border-only cards, Geist Sans + tabular-nums for table numerics, pill `shape` prop, 24px admin type cap). Net-new in v3.0:
-
-- **Tokens** — violet/blue/teal **pales**, full **coral** family (`coral`, `coral-pale`, `coral-deep`), extended neutrals (`ink-2`, `ink-3`, `stone`, `fog`, `chalk`, `white`, `black`), marketing type scale (reference-only: `--text-h1..--text-pretitle`), `--space-0..--space-40` aliases, `--width-sidebar-collapsed`.
-- **Gradients** — `--gradient-hero-violet`, `--gradient-hero-blue`, `--gradient-card`, `--gradient-teal-chip`.
-- **Flattened shadow tokens** — `--shadow-card` (hairline), `--shadow-card-hover` (hairline + 1px drop), `--shadow-inset-hairline`. Existing `--shadow-md` / `--shadow-lg` unchanged (overlays/dialogs).
-- **Brand assets** — TruCare master mark (blue / ink / white) and TruIntake bloom mark pulled from the Figma branding doc; live at `/public/brand/*`. Also a frozen reference snapshot of the bundle at `/brand-bundle/` for future diffs.
-- **Demo (v3.0 flat file)** — new "Brand (v3.0)" nav group: Logo family, Shadows, Marketing type (reference). Colors + Gradients sections extended with pales, coral, and marketing (180°) hero gradients.
-- **No marketing React components.** Hero / Nav / ProductGrid / StatsBand / Footer stay out of the admin library — `@trucare/ui` remains admin-pure. Marketing patterns live only as reference tokens + preview cards in the flat file.
-- **MetricCard** — already exceeds the bundle's `KpiCard` spec (delta prop, trend arrows, tabular-nums, `invertTrend` for Denial Rate / Days-in-AR). No code changes.
-- **ClaimDetailDrawer** — not added as a new component; compose from existing `Sheet` + `DetailSection` + `DetailRow`.
-
-Ship: `trucare-design-system-v3.0.html` (replaces v2.2).
-
 ## Quick Start
 
 ```bash
