@@ -261,6 +261,14 @@ const claimFilters: FilterDefinition[] = [
 
 const navGroups = [
   {
+    title: "Brand (v3.0)",
+    items: [
+      { label: "Logo Family", id: "logo-family" },
+      { label: "Shadows", id: "shadows" },
+      { label: "Marketing Type (ref)", id: "marketing-type" },
+    ],
+  },
+  {
     title: "Foundations",
     items: [
       { label: "Colors", id: "colors" },
@@ -305,10 +313,11 @@ const navGroups = [
 
 const colorGroups = [
   {
-    title: "Primary",
+    title: "Primary — Violet",
     colors: [
-      { name: "Vivid Violet", hex: "#604FF8" },
+      { name: "Violet Pale", hex: "#CFCAFD" },
       { name: "Violet Light", hex: "#8478FA" },
+      { name: "Vivid Violet", hex: "#604FF8" },
       { name: "Royal Indigo", hex: "#3B30A1" },
       { name: "Nocturne Indigo", hex: "#16114A" },
     ],
@@ -316,6 +325,7 @@ const colorGroups = [
   {
     title: "Blue",
     colors: [
+      { name: "Blue Pale", hex: "#8ABAFE" },
       { name: "Electric Azure", hex: "#095BCE" },
       { name: "Mariner Blue", hex: "#05377C" },
       { name: "Deep Nautical", hex: "#042452" },
@@ -324,18 +334,33 @@ const colorGroups = [
   {
     title: "Teal",
     colors: [
+      { name: "Teal Pale", hex: "#A1F2EA" },
       { name: "Tropical Aqua", hex: "#22D3C1" },
       { name: "Deep Teal", hex: "#147F74" },
       { name: "Abyss Teal", hex: "#072A27" },
     ],
   },
   {
+    title: "Coral — warn / urgent only",
+    colors: [
+      { name: "Coral Pale", hex: "#FFCEC6" },
+      { name: "Coral", hex: "#FF5B42" },
+      { name: "Coral Deep", hex: "#5E1D14" },
+    ],
+  },
+  {
     title: "Neutrals",
     colors: [
       { name: "Obsidian Ink", hex: "#151A20" },
+      { name: "Ink 2", hex: "#17191E" },
+      { name: "Ink 3", hex: "#22232F" },
       { name: "Gunmetal Slate", hex: "#404D60" },
       { name: "Harbor Mist", hex: "#889AB3" },
+      { name: "Stone", hex: "#C3CDD9" },
+      { name: "Chalk", hex: "#D9D9D9" },
       { name: "Soft Cloud", hex: "#F3F4F7" },
+      { name: "Fog", hex: "#F9F9FB" },
+      { name: "White", hex: "#FFFFFF" },
     ],
   },
   {
@@ -361,7 +386,7 @@ const spacingScale = [4, 8, 12, 16, 20, 24, 32, 40]
 
 function App() {
   const [dark, setDark] = useState(false)
-  const [activeSection, setActiveSection] = useState("colors")
+  const [activeSection, setActiveSection] = useState("logo-family")
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>({})
   const [detailPanelOpen, setDetailPanelOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -396,7 +421,7 @@ function App() {
               </svg>
             </div>
             <span className="text-sm font-semibold tracking-tight">TruCare Design System</span>
-            <Badge variant="secondary" className="text-xs">v2.0</Badge>
+            <Badge variant="secondary" className="text-xs">v3.0</Badge>
           </div>
 
           <Tooltip>
@@ -447,6 +472,145 @@ function App() {
           <div className="max-w-4xl px-6 py-5 space-y-8">
 
             {/* ========================================
+                v3.0 — LOGO FAMILY
+                ======================================== */}
+            <section id="logo-family">
+              <h2 className="text-xl font-medium">Logo family</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                TruCare master mark (sprouting-T) sourced from the Figma branding doc. Use the blue mark on light
+                backgrounds, white on dark. Product marks ship per-product — TruIntake is the 4-petal bloom; TruCred /
+                TruRev / TruIntel are placeholders pending vector handoff.
+              </p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <Card className="p-5">
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">Master mark — light surface</h3>
+                  <div className="flex items-center gap-4 rounded-md border bg-card p-6">
+                    <img src="/brand/trucare-mark-blue.png" alt="TruCare mark" className="h-12 w-12" />
+                    <span style={{ fontSize: "28px", fontWeight: 500, letterSpacing: "-0.02em" }}>TruCare</span>
+                  </div>
+                </Card>
+                <Card className="p-5" style={{ background: "#151A20" }}>
+                  <h3 className="mb-3 text-sm font-medium" style={{ color: "rgba(255,255,255,0.65)" }}>Master mark — dark surface</h3>
+                  <div className="flex items-center gap-4 rounded-md p-6" style={{ background: "#151A20" }}>
+                    <img src="/brand/trucare-mark-white.png" alt="TruCare mark" className="h-12 w-12" />
+                    <span style={{ fontSize: "28px", fontWeight: 500, letterSpacing: "-0.02em", color: "#fff" }}>TruCare</span>
+                  </div>
+                </Card>
+              </div>
+
+              <div className="mt-4">
+                <h3 className="mb-2 text-sm font-medium text-muted-foreground">Products</h3>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <Card className="p-4 flex flex-col items-center gap-2">
+                    <img src="/brand/truintake-mark.png" alt="TruIntake" className="h-10 w-10" />
+                    <span className="text-sm font-medium">TruIntake</span>
+                    <span className="text-[11px] text-muted-foreground">Eligibility &amp; intake</span>
+                  </Card>
+                  <Card className="p-4 flex flex-col items-center gap-2">
+                    <div className="h-10 w-10 rounded-md flex items-center justify-center" style={{ background: "var(--gradient-violet)" }}>
+                      <span className="text-white text-sm font-semibold">Tc</span>
+                    </div>
+                    <span className="text-sm font-medium">TruCred</span>
+                    <span className="text-[11px] text-muted-foreground">Placeholder</span>
+                  </Card>
+                  <Card className="p-4 flex flex-col items-center gap-2">
+                    <div className="h-10 w-10 rounded-md flex items-center justify-center" style={{ background: "var(--gradient-brand)" }}>
+                      <span className="text-white text-sm font-semibold">Tr</span>
+                    </div>
+                    <span className="text-sm font-medium">TruRev</span>
+                    <span className="text-[11px] text-muted-foreground">Placeholder</span>
+                  </Card>
+                  <Card className="p-4 flex flex-col items-center gap-2">
+                    <div className="h-10 w-10 rounded-md flex items-center justify-center" style={{ background: "var(--gradient-teal)" }}>
+                      <span className="text-white text-sm font-semibold">Ti</span>
+                    </div>
+                    <span className="text-sm font-medium">TruIntel</span>
+                    <span className="text-[11px] text-muted-foreground">Placeholder</span>
+                  </Card>
+                </div>
+              </div>
+            </section>
+
+            <Separator />
+
+            {/* ========================================
+                v3.0 — SHADOWS (flattened)
+                ======================================== */}
+            <section id="shadows">
+              <h2 className="text-xl font-medium">Shadows</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Flattened in v3.0. Cards use hairline borders, not drop shadows. <code className="font-mono text-xs">shadow-md</code> / <code className="font-mono text-xs">shadow-lg</code> are reserved for overlays &amp; dialogs.
+              </p>
+              <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
+                {[
+                  { name: "card", token: "--shadow-card", shadow: "0 0 0 1px rgba(4,36,82,0.06)", desc: "Hairline — default card" },
+                  { name: "card-hover", token: "--shadow-card-hover", shadow: "0 0 0 1px rgba(4,36,82,0.08), 0 1px 2px -1px rgba(4,36,82,0.06)", desc: "Lift on hover" },
+                  { name: "inset-hairline", token: "--shadow-inset-hairline", shadow: "inset 0 0 0 0.5px rgba(3,27,62,0.1)", desc: "Chips on gradients" },
+                  { name: "md", token: "--shadow-md", shadow: "0 2px 8px -1px rgba(0,0,0,0.06), 0 1px 2px -1px rgba(0,0,0,0.04)", desc: "Dropdowns, popovers" },
+                  { name: "lg", token: "--shadow-lg", shadow: "0 4px 16px -2px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.04)", desc: "Dialogs, sheets" },
+                ].map((s) => (
+                  <div key={s.name} className="flex flex-col gap-2">
+                    <div
+                      className="h-16 rounded-md bg-card"
+                      style={{ boxShadow: s.shadow }}
+                    />
+                    <div>
+                      <code className="font-mono text-xs">{s.token}</code>
+                      <p className="text-[11px] text-muted-foreground">{s.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <Separator />
+
+            {/* ========================================
+                v3.0 — MARKETING TYPE (REFERENCE)
+                ======================================== */}
+            <section id="marketing-type">
+              <h2 className="text-xl font-medium">Marketing type scale</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Reference only. The admin product is capped at 24px; marketing tokens (<code className="font-mono text-xs">--text-h1..micro</code>) exist for parity with <span className="font-mono text-xs">trucarebilling.com</span> and must not be used by admin components.
+              </p>
+              <Card className="mt-4 p-5">
+                <div className="space-y-3">
+                  {[
+                    { label: "H1", px: 68, w: 500, ls: "-0.03em", lh: 1.09, sample: "Practice Made Perfect." },
+                    { label: "H2", px: 48, w: 500, ls: "-0.03em", lh: 1.09, sample: "Proven results where it matters most" },
+                    { label: "H3", px: 40, w: 500, ls: "-0.03em", lh: 1.1, sample: "Unified intake, eligibility, and revenue visibility" },
+                    { label: "H4", px: 33, w: 500, ls: "-0.02em", lh: 1.18, sample: "Your data is secure with TruCare" },
+                    { label: "H5", px: 27, w: 500, ls: "-0.01em", lh: 1.2, sample: "Clean claims start at the front door" },
+                    { label: "H6", px: 23, w: 500, ls: "normal", lh: 1.25, sample: "Billing in weeks, not months" },
+                    { label: "Lead", px: 20, w: 400, ls: "normal", lh: 1.5, sample: "TruCred automates provider data end-to-end." },
+                    { label: "Body", px: 16, w: 400, ls: "normal", lh: 1.6, sample: "Stop chasing patients for updated insurance cards." },
+                    { label: "Pretitle", px: 13, w: 400, ls: "normal", lh: 1.4, sample: "FOR REVENUE TEAMS", transform: "uppercase" },
+                  ].map((t) => (
+                    <div key={t.label} className="flex items-baseline justify-between gap-4 border-b pb-2 last:border-b-0 last:pb-0">
+                      <span
+                        className="truncate"
+                        style={{
+                          fontSize: `${t.px}px`,
+                          fontWeight: t.w,
+                          letterSpacing: t.ls,
+                          lineHeight: t.lh,
+                          textTransform: (t as { transform?: "uppercase" }).transform,
+                        }}
+                      >
+                        {t.sample}
+                      </span>
+                      <span className="shrink-0 font-mono text-[11px] text-muted-foreground">
+                        {t.label} &middot; {t.px}px / {t.w}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </section>
+
+            <Separator />
+
+            {/* ========================================
                 COLORS
                 ======================================== */}
             <section id="colors">
@@ -481,22 +645,46 @@ function App() {
             <section id="gradients">
               <h2 className="text-xl font-medium">Gradients</h2>
               <p className="mt-1 text-sm text-muted-foreground">Brand gradients derived from the core palette. Use for feature highlights, hero areas, and accent backgrounds.</p>
-              <div className="mt-4 flex flex-wrap gap-3">
-                {[
-                  { name: "Violet", css: "linear-gradient(135deg, #604FF8, #8478FA)" },
-                  { name: "Blue", css: "linear-gradient(135deg, #095BCE, #05377C)" },
-                  { name: "Teal", css: "linear-gradient(135deg, #22D3C1, #147F74)" },
-                  { name: "Ink", css: "linear-gradient(135deg, #151A20, #404D60)" },
-                  { name: "Brand", css: "linear-gradient(135deg, #604FF8, #095BCE)" },
-                ].map((g) => (
-                  <div key={g.name} className="flex flex-col items-center gap-1.5">
-                    <div
-                      className="h-16 w-28 rounded-lg border"
-                      style={{ background: g.css }}
-                    />
-                    <span className="text-xs font-medium">{g.name}</span>
+              <div className="mt-4 space-y-5">
+                <div>
+                  <h3 className="mb-2 text-sm font-medium text-muted-foreground">Accent (135°) — chips, badges, ink</h3>
+                  <div className="flex flex-wrap gap-3">
+                    {[
+                      { name: "Violet", css: "linear-gradient(135deg, #604FF8, #8478FA)" },
+                      { name: "Blue", css: "linear-gradient(135deg, #095BCE, #05377C)" },
+                      { name: "Teal", css: "linear-gradient(135deg, #22D3C1, #147F74)" },
+                      { name: "Ink", css: "linear-gradient(135deg, #151A20, #404D60)" },
+                      { name: "Brand", css: "linear-gradient(135deg, #604FF8, #095BCE)" },
+                    ].map((g) => (
+                      <div key={g.name} className="flex flex-col items-center gap-1.5">
+                        <div
+                          className="h-16 w-28 rounded-lg border"
+                          style={{ background: g.css }}
+                        />
+                        <span className="text-xs font-medium">{g.name}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+                <div>
+                  <h3 className="mb-2 text-sm font-medium text-muted-foreground">Marketing surfaces (180°) — reference only, not used in admin</h3>
+                  <div className="flex flex-wrap gap-3">
+                    {[
+                      { name: "Hero Violet", css: "linear-gradient(180deg, #031B3E 0%, #05377C 25%, #604FF8 50%, #A095FB 75%, #F3F4F7 100%)" },
+                      { name: "Hero Blue", css: "linear-gradient(180deg, #031B3E 0%, #05377C 25%, #095BCE 50%, #9DBDEB 75%, #F3F4F7 100%)" },
+                      { name: "Card Surface", css: "linear-gradient(180deg, #FFFFFF 0%, #F9F9FB 100%)" },
+                      { name: "Teal Chip", css: "linear-gradient(180deg, #147F74 0%, #22D3C1 100%)" },
+                    ].map((g) => (
+                      <div key={g.name} className="flex flex-col items-center gap-1.5">
+                        <div
+                          className="h-24 w-28 rounded-lg border"
+                          style={{ background: g.css }}
+                        />
+                        <span className="text-xs font-medium">{g.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </section>
 
@@ -1793,7 +1981,7 @@ function App() {
                       </div>
                     }
                     title="TruCare"
-                    version="v2.0"
+                    version="v3.0"
                     globalAction={{ label: "New Claim", icon: <Plus className="h-4 w-4" />, onClick: () => toast.info("New claim action") }}
                     user={{ name: "Dr. Sarah Johnson", email: "sarah@trucarehealth.com" }}
                     onThemeToggle={() => setDark(!dark)}
